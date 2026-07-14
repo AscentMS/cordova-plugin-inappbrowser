@@ -243,32 +243,17 @@ static CDVWKInAppBrowser* instance = nil;
     // Run later to avoid the "took a long time" log message.
     dispatch_async(dispatch_get_main_queue(), ^{
         if (weakSelf.inAppBrowserViewController != nil) {
-            float osVersion = [[[UIDevice currentDevice] systemVersion] floatValue];
-            __strong __typeof(weakSelf) strongSelf = weakSelf;
-            if (!strongSelf->tmpWindow) {
-                if (@available(iOS 13.0, *)) {
-                    UIWindowScene *scene = strongSelf.viewController.view.window.windowScene;
-                    if (scene) {
-                        strongSelf->tmpWindow = [[UIWindow alloc] initWithWindowScene:scene];
-                    }
-                }
-
-                if (!strongSelf->tmpWindow) {
-                    CGRect frame = [[UIScreen mainScreen] bounds];
-                    if(initHidden && osVersion < 11){
-                       frame.origin.x = -10000;
-                    }
-                    strongSelf->tmpWindow = [[UIWindow alloc] initWithFrame:frame];
-                }
+            UIViewController *presentingController = weakSelf.viewController;
+            while (presentingController.presentedViewController != nil) {
+                presentingController = presentingController.presentedViewController;
             }
-            UIViewController *tmpController = [[UIViewController alloc] init];
-            [strongSelf->tmpWindow setRootViewController:tmpController];
-            [strongSelf->tmpWindow setWindowLevel:UIWindowLevelNormal];
 
-            if(!initHidden || osVersion < 11){
-                [self->tmpWindow makeKeyAndVisible];
+            if (presentingController == nil) {
+                NSLog(@"InAppBrowser could not find a presenting view controller.");
+                return;
             }
-            [tmpController presentViewController:nav animated:!noAnimate completion:nil];
+
+            [presentingController presentViewController:nav animated:!noAnimate completion:nil];
         }
     });
 }
@@ -1230,3 +1215,4 @@ BOOL isExiting = FALSE;
 }
 
 @end //CDVWKInAppBrowserViewController
+
