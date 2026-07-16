@@ -226,19 +226,10 @@ static CDVWKInAppBrowser* instance = nil;
         initHidden = YES;
     }
     
-    [[[UIAlertView alloc] initWithTitle:@"IAB show"
-                                message:[NSString stringWithFormat:@"entered noAnimate=%@ initHidden=%@ vc=%@", noAnimate ? @"YES" : @"NO", initHidden ? @"YES" : @"NO", self.inAppBrowserViewController ? NSStringFromClass([self.inAppBrowserViewController class]) : @"nil"]
-                               delegate:nil
-                      cancelButtonTitle:@"OK"
-                      otherButtonTitles:nil] show];
+    NSLog(@"IAB show entered noAnimate=%@ initHidden=%@ inAppBrowserViewController=%@", noAnimate ? @"YES" : @"NO", initHidden ? @"YES" : @"NO", self.inAppBrowserViewController ? NSStringFromClass([self.inAppBrowserViewController class]) : @"nil");
     
     if (self.inAppBrowserViewController == nil) {
         NSLog(@"Tried to show IAB after it was closed.");
-        [[[UIAlertView alloc] initWithTitle:@"IAB show"
-                                    message:@"inAppBrowserViewController is nil"
-                                   delegate:nil
-                          cancelButtonTitle:@"OK"
-                          otherButtonTitles:nil] show];
         return;
     }
     
@@ -259,35 +250,18 @@ static CDVWKInAppBrowser* instance = nil;
                 presentingController = presentingController.presentedViewController;
             }
 
-            [[[UIAlertView alloc] initWithTitle:@"IAB show"
-                                        message:[NSString stringWithFormat:@"presenter=%@ presented=%@ navStyle=%ld", presentingController ? NSStringFromClass([presentingController class]) : @"nil", presentingController.presentedViewController ? NSStringFromClass([presentingController.presentedViewController class]) : @"nil", (long)nav.modalPresentationStyle]
-                                       delegate:nil
-                              cancelButtonTitle:@"OK"
-                              otherButtonTitles:nil] show];
+            NSLog(@"IAB show presentingController=%@ currentlyPresented=%@ navStyle=%ld", presentingController ? NSStringFromClass([presentingController class]) : @"nil", presentingController.presentedViewController ? NSStringFromClass([presentingController.presentedViewController class]) : @"nil", (long)nav.modalPresentationStyle);
 
             if (presentingController == nil) {
                 NSLog(@"InAppBrowser could not find a presenting view controller.");
-                [[[UIAlertView alloc] initWithTitle:@"IAB show"
-                                            message:@"presentingController is nil"
-                                           delegate:nil
-                                  cancelButtonTitle:@"OK"
-                                  otherButtonTitles:nil] show];
                 return;
             }
 
             [presentingController presentViewController:nav animated:!noAnimate completion:^{
-                [[[UIAlertView alloc] initWithTitle:@"IAB show"
-                                            message:[NSString stringWithFormat:@"present complete nav=%@ visible=%@", NSStringFromClass([nav class]), nav.view.window ? @"YES" : @"NO"]
-                                           delegate:nil
-                                  cancelButtonTitle:@"OK"
-                                  otherButtonTitles:nil] show];
+                NSLog(@"IAB show present complete nav=%@ visible=%@", NSStringFromClass([nav class]), nav.view.window ? @"YES" : @"NO");
             }];
         } else {
-            [[[UIAlertView alloc] initWithTitle:@"IAB show"
-                                        message:@"weakSelf.inAppBrowserViewController nil inside dispatch"
-                                       delegate:nil
-                              cancelButtonTitle:@"OK"
-                              otherButtonTitles:nil] show];
+            NSLog(@"IAB show weakSelf.inAppBrowserViewController nil inside dispatch");
         }
     });
 }
@@ -1262,6 +1236,7 @@ BOOL isExiting = FALSE;
 }
 
 @end //CDVWKInAppBrowserViewController
+
 
 
 
