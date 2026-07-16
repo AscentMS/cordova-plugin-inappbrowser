@@ -839,7 +839,7 @@ BOOL isExiting = FALSE;
         [self.toolbar setItems:@[self.closeButton, flexibleSpaceButton, self.backButton, fixedSpaceButton, self.forwardButton]];
     }
     
-    self.view.backgroundColor = [UIColor clearColor];
+    self.view.backgroundColor = [UIColor whiteColor];
     [self.view addSubview:self.toolbar];
     [self.view addSubview:self.addressLabel];
     [self.view addSubview:self.spinner];
@@ -986,6 +986,19 @@ BOOL isExiting = FALSE;
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+
+    self.view.hidden = NO;
+    self.webView.hidden = NO;
+    [self rePositionViews];
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+
+    self.view.hidden = NO;
+    self.webView.hidden = NO;
+    [self rePositionViews];
 }
 
 - (void)viewDidDisappear:(BOOL)animated
@@ -1215,4 +1228,6 @@ BOOL isExiting = FALSE;
 }
 
 @end //CDVWKInAppBrowserViewController
+
+
 
