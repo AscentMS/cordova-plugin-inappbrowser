@@ -225,10 +225,7 @@ static CDVWKInAppBrowser* instance = nil;
     if(command == nil && noAnimate == YES){
         initHidden = YES;
     }
-    
-    NSLog(@"IAB show entered noAnimate=%@ initHidden=%@ inAppBrowserViewController=%@", noAnimate ? @"YES" : @"NO", initHidden ? @"YES" : @"NO", self.inAppBrowserViewController ? NSStringFromClass([self.inAppBrowserViewController class]) : @"nil");
-    
-    if (self.inAppBrowserViewController == nil) {
+if (self.inAppBrowserViewController == nil) {
         NSLog(@"Tried to show IAB after it was closed.");
         return;
     }
@@ -249,19 +246,12 @@ static CDVWKInAppBrowser* instance = nil;
             while (presentingController.presentedViewController != nil) {
                 presentingController = presentingController.presentedViewController;
             }
-
-            NSLog(@"IAB show presentingController=%@ currentlyPresented=%@ navStyle=%ld", presentingController ? NSStringFromClass([presentingController class]) : @"nil", presentingController.presentedViewController ? NSStringFromClass([presentingController.presentedViewController class]) : @"nil", (long)nav.modalPresentationStyle);
-
-            if (presentingController == nil) {
+if (presentingController == nil) {
                 NSLog(@"InAppBrowser could not find a presenting view controller.");
                 return;
             }
 
-            [presentingController presentViewController:nav animated:!noAnimate completion:^{
-                NSLog(@"IAB show present complete nav=%@ visible=%@", NSStringFromClass([nav class]), nav.view.window ? @"YES" : @"NO");
-            }];
-        } else {
-            NSLog(@"IAB show weakSelf.inAppBrowserViewController nil inside dispatch");
+            [presentingController presentViewController:nav animated:!noAnimate completion:nil];
         }
     });
 }
@@ -1236,6 +1226,8 @@ BOOL isExiting = FALSE;
 }
 
 @end //CDVWKInAppBrowserViewController
+
+
 
 
 
