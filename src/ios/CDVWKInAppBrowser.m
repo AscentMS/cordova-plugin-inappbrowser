@@ -222,10 +222,11 @@ static CDVWKInAppBrowser* instance = nil;
 - (void)show:(CDVInvokedUrlCommand*)command withNoAnimate:(BOOL)noAnimate
 {
     BOOL initHidden = NO;
-    if(command == nil && noAnimate == YES){
+    if (command == nil && noAnimate == YES) {
         initHidden = YES;
     }
-if (self.inAppBrowserViewController == nil) {
+
+    if (self.inAppBrowserViewController == nil) {
         NSLog(@"Tried to show IAB after it was closed.");
         return;
     }
@@ -242,11 +243,17 @@ if (self.inAppBrowserViewController == nil) {
     // Run later to avoid the "took a long time" log message.
     dispatch_async(dispatch_get_main_queue(), ^{
         if (weakSelf.inAppBrowserViewController != nil) {
+            if (initHidden) {
+                // Preserve hidden=yes startup by deferring presentation until an explicit show call.
+                return;
+            }
+
             UIViewController *presentingController = weakSelf.viewController;
             while (presentingController.presentedViewController != nil) {
                 presentingController = presentingController.presentedViewController;
             }
-if (presentingController == nil) {
+
+            if (presentingController == nil) {
                 NSLog(@"InAppBrowser could not find a presenting view controller.");
                 return;
             }
@@ -266,8 +273,6 @@ if (presentingController == nil) {
     if (self.inAppBrowserViewController == nil) {
         NSLog(@"Tried to hide IAB after it was closed.");
         return;
-        
-        
     }
     
     // Run later to avoid the "took a long time" log message.
@@ -837,7 +842,7 @@ BOOL isExiting = FALSE;
         [self.toolbar setItems:@[self.closeButton, flexibleSpaceButton, self.backButton, fixedSpaceButton, self.forwardButton]];
     }
     
-    self.view.backgroundColor = [UIColor whiteColor];
+    self.view.backgroundColor = [UIColor clearColor];
     [self.view addSubview:self.toolbar];
     [self.view addSubview:self.addressLabel];
     [self.view addSubview:self.spinner];
@@ -984,18 +989,6 @@ BOOL isExiting = FALSE;
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-
-    self.view.hidden = NO;
-    self.webView.hidden = NO;
-    [self rePositionViews];
-}
-
-- (void)viewDidAppear:(BOOL)animated
-{
-    [super viewDidAppear:animated];
-
-    self.view.hidden = NO;
-    self.webView.hidden = NO;
     [self rePositionViews];
 }
 
@@ -1226,10 +1219,3 @@ BOOL isExiting = FALSE;
 }
 
 @end //CDVWKInAppBrowserViewController
-
-
-
-
-
-
-
