@@ -222,10 +222,10 @@ static CDVWKInAppBrowser* instance = nil;
 - (void)show:(CDVInvokedUrlCommand*)command withNoAnimate:(BOOL)noAnimate
 {
     BOOL initHidden = NO;
-    if(command == nil && noAnimate == YES){
+    if (command == nil && noAnimate == YES) {
         initHidden = YES;
     }
-    
+
     if (self.inAppBrowserViewController == nil) {
         NSLog(@"Tried to show IAB after it was closed.");
         return;
@@ -243,32 +243,22 @@ static CDVWKInAppBrowser* instance = nil;
     // Run later to avoid the "took a long time" log message.
     dispatch_async(dispatch_get_main_queue(), ^{
         if (weakSelf.inAppBrowserViewController != nil) {
-            float osVersion = [[[UIDevice currentDevice] systemVersion] floatValue];
-            __strong __typeof(weakSelf) strongSelf = weakSelf;
-            if (!strongSelf->tmpWindow) {
-                if (@available(iOS 13.0, *)) {
-                    UIWindowScene *scene = strongSelf.viewController.view.window.windowScene;
-                    if (scene) {
-                        strongSelf->tmpWindow = [[UIWindow alloc] initWithWindowScene:scene];
-                    }
-                }
-
-                if (!strongSelf->tmpWindow) {
-                    CGRect frame = [[UIScreen mainScreen] bounds];
-                    if(initHidden && osVersion < 11){
-                       frame.origin.x = -10000;
-                    }
-                    strongSelf->tmpWindow = [[UIWindow alloc] initWithFrame:frame];
-                }
+            if (initHidden) {
+                // Preserve hidden=yes startup by deferring presentation until an explicit show call.
+                return;
             }
-            UIViewController *tmpController = [[UIViewController alloc] init];
-            [strongSelf->tmpWindow setRootViewController:tmpController];
-            [strongSelf->tmpWindow setWindowLevel:UIWindowLevelNormal];
 
-            if(!initHidden || osVersion < 11){
-                [self->tmpWindow makeKeyAndVisible];
+            UIViewController *presentingController = weakSelf.viewController;
+            while (presentingController.presentedViewController != nil) {
+                presentingController = presentingController.presentedViewController;
             }
-            [tmpController presentViewController:nav animated:!noAnimate completion:nil];
+
+            if (presentingController == nil) {
+                NSLog(@"InAppBrowser could not find a presenting view controller.");
+                return;
+            }
+
+            [presentingController presentViewController:nav animated:!noAnimate completion:nil];
         }
     });
 }
@@ -283,8 +273,6 @@ static CDVWKInAppBrowser* instance = nil;
     if (self.inAppBrowserViewController == nil) {
         NSLog(@"Tried to hide IAB after it was closed.");
         return;
-        
-        
     }
     
     // Run later to avoid the "took a long time" log message.
@@ -1001,6 +989,7 @@ BOOL isExiting = FALSE;
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    [self rePositionViews];
 }
 
 - (void)viewDidDisappear:(BOOL)animated
